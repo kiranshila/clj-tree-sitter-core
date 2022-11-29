@@ -1,0 +1,4 @@
+{:deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        io.github.IGJoshua/coffi {:git/sha "65c7544cc7ed9d6c815da821a9a9899cf185b3e4"}}
+ :src-dirs ["src"]
+ :aliases {:dev {:jvm-opts ["--enable-preview" "--enable-native-access=ALL-UNNAMED"]}}}
