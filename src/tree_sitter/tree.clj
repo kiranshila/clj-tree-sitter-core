@@ -3,7 +3,9 @@
    [tree-sitter.library]
    [coffi.mem :as mem]
    [coffi.ffi :as ffi :refer [defcfn]]
-   [tree-sitter.types :as t]))
+   [tree-sitter.types :as t]
+
+   [tree-sitter.node :as node]))
 
 ; ..
 
@@ -13,4 +15,7 @@
 
 (defcfn root-node
   "Get the root node of the syntax tree."
-  "ts_tree_root_node" [::t/TSTree*] ::t/TSNode)
+  "ts_tree_root_node" [::t/TSTree*] ::t/TSNode
+  rn
+  [tree]
+  (#'node/->clj (rn tree)))
