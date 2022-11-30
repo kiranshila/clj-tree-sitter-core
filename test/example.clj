@@ -7,7 +7,7 @@
 
 (def tree
   (let [parser (p/make-parser :json)]
-    (->> "[1,null]"
+    (->> "[1, null]"
          (p/parse-string parser)
-         t/root-node
+         #_t/root-node
          #_n/as-string)))
