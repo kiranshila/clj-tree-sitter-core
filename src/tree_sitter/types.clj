@@ -67,3 +67,12 @@
     [::mem/struct
      [[:row ::uint-32]
       [:column ::uint-32]]]))
+
+; ..
+
+(defalias ::TSNode
+  (with-c-layout
+    [::mem/struct
+     [[:context [::mem/array ::uint-32 4]]
+      [:id ::mem/pointer]
+      [:tree ::TSTree*]]]))
