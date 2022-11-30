@@ -2,7 +2,7 @@
   (:require
    [tree-sitter.library]
    [tree-sitter.types :as t]
-   [tree-sitter.tree]
+   [tree-sitter.tree :as tree]
    [coffi.mem :as mem]
    [coffi.ffi :as ffi :refer [defcfn]]))
 
@@ -28,24 +28,25 @@
     parser))
 
 (defcfn ^:private new'
-  "ts_parser_new" [] ::t/TSParser*)
+  "ts_parser_new" [] ::t/TSParser*
+  new''
+  [session]
+  (let [ptr (new'')
+        gcd (mem/as-segment ptr 1 session)]
+    (mem/add-close-action! session #(delete ptr))
+    gcd))
 
 (defn make-parser
   "Create a new parser given a language.
 
   To load a system library that contains the grammar pass the name in as a keyword
   otherwise, pass in a fully qualified path to the shared object and the name as a keyword."
-  {:arglists '([lang] [lang session] [path lang] [path lang session])}
-  ([lang]
+  ([lang session]
    (ffi/load-system-library (str "tree-sitter-" (name lang)))
-   (set-language (new') lang))
-  ([path lang]
+   (set-language (new' session) lang))
+  ([path lang session]
    (ffi/load-library path)
-   (set-language (new') lang)))
-
-(defcfn language
-  "Get the parser's current language."
-  "ts_parser_language" [::t/TSParser*] ::t/TSLanguage*)
+   (set-language (new' session) lang)))
 
 ;; ...
 
@@ -53,5 +54,8 @@
   "Use the parser to parse some source code stored in one contiguous buffer."
   "ts_parser_parse_string" [::t/TSParser* ::t/TSTree* ::mem/c-string ::t/uint-32] ::t/TSTree*
   parse
-  [parser source]
-  (parse parser nil source (count (.getBytes source))))
+  [parser source session]
+  (let [tree-ptr (parse parser nil source (count (.getBytes source)))
+        gcd (mem/as-segment tree-ptr 1 session)]
+    (mem/add-close-action! session #(#'tree/delete tree-ptr))
+    gcd))
